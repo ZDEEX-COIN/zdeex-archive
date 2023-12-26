@@ -1,0 +1,5 @@
+# List of fixed seed nodes for testnet
+# note: File must be non-empty to compile
+1.2.3.4
+
+# Onion nodes

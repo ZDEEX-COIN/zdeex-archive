@@ -1,0 +1,25 @@
+Copyright (c) 2018-2020 The Hush developers
+Copyright (c) 2009-2017 The Bitcoin Core developers
+Copyright (c) 2009-2018 Bitcoin Developers
+Copyright (c) 2016-2017 The Zcash developers
+Copyright (c) 2016-2019 The Komodo developers
+
+This is Free Software released under GPLv3. Any misuse of this software
+will be followed up with GPL enforcement via Software Freedom Law Center:
+https://www.softwarefreedom.org/
+
+If you incorporate any code from the Hush Full Node (this software), your
+code must be licensed as GPLv3 (not GPLv2 or MIT).
+
+The GPLv3 software license applies to the code directly included in this source distribution.
+See the LICENSE file for full information.  
+Dependencies downloaded as part of the build process may be covered by other
+open-source licenses. For further details see 'contrib/debian/copyright'.
+
+This product includes software developed by the OpenSSL Project for use in the
+OpenSSL Toolkit (https://www.openssl.org/). This product includes cryptographic
+software written by Eric Young (eay@cryptsoft.com).
+
+We are open to granting more permissive (such as MIT or Apache 2.0) licenses to Hush
+software on a *case-by-case* basis, for an agreed upon price. Please contact
+The Hush developers if you are interested.

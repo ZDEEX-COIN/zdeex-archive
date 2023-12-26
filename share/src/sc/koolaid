@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Copyright (c) 2018-2023 The Hush developers
+./hush-smart-chain -ac_name=KOOLAID $@

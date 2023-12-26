@@ -1,0 +1,22 @@
+[Unit]
+Description=Hush: Speak And Transact Freely
+After=network.target
+
+[Service]
+User=hush
+Group=hush
+
+Type=forking
+PIDFile=/var/lib/hushd/hushd.pid
+ExecStart=/usr/bin/hushd -daemon -pid=/var/lib/hushd/hushd.pid \
+-conf=/etc/hush/hush.conf -datadir=/var/lib/hushd -disablewallet
+
+Restart=always
+PrivateTmp=true
+TimeoutStopSec=60s
+TimeoutStartSec=2s
+StartLimitInterval=120s
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target

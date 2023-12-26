@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo "./src/hush-cli -ac_name=ANTISPAM $@"
+./src/hush-cli -ac_name=ANTISPAM "$@"

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# any CLI args given to this script will be passed along
+# example: ./test_randomx -debug=randomx
+ ./src/hushd -ac_randomx_interval=10 -ac_randomx_lag=3 -ac_halving=20 -ac_algo=randomx -ac_name=RANDOMX10 -ac_private=1 -ac_blocktime=20 -ac_reward=500000000 -ac_supply=55555 -gen=1 -genproclimit=1 -testnode=1 $@
+
+# to run via the debugger
+# type "run" when gdb prompt appears
+#gdb --args ./src/hushd -- -ac_algo=randomx -ac_name=RANDOMX -ac_private=1 -ac_blocktime=30 -ac_reward=500000000 -ac_supply=55555 -gen=1 -genproclimit=1 -testnode=1

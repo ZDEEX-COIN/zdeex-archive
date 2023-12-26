@@ -1,0 +1,19 @@
+{
+"authorized": [
+    {"dukeleto":"030554bffcf6dfcb34a20c486ff0a5be5546b9cc16fba969216527263f8e98c4af" },
+    {"gilardh":"020554bffcf6dfcb34a20c486ff5a5be5546b9cc06fba9692165272b3f8e98c448" },
+    {"nhdigitalcash":"030554bffcf6dfcb34a20c086ff5a5be5546b9cc16fba9692105272b3f8e98c4a0" },
+    {"miodrag":"02b25de3ee5335518b06f69f4fbabb029cfc737603b100996841d5532b324a5a61" }
+],
+"tokens":[
+],
+"files":[
+    {"filename":"hushd","prices":[{"HUSH":0.1}, {"ZEC":1}]}
+],
+"externalcoins":[
+    { "BTC":"bitcoin-cli" },
+    { "HUSH":"hush-cli" },
+    { "ZEC":"zcash-cli" }
+]
+}
+

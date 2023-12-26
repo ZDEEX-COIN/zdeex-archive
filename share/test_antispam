@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# any CLI args given to this script will be passed along
+# example: ./test_antispam -debug=blah
+#./src/hushd -ac_name=ANTISPAM -ac_private=1 -ac_blocktime=180 -ac_reward=500000000 -ac_supply=55555 -gen=1 -genproclimit=1 -testnode=1 $@
+
+./src/hushd -ac_name=ANTISPAM -ac_private=1 -ac_blocktime=180 -ac_reward=500000000 -ac_supply=55555 $@
+# to run via the debugger
+# type "run" when gdb prompt appears
+#gdb --args ./src/hushd -- -ac_algo=randomx -ac_name=ANTISPAM -ac_private=1 -ac_blocktime=180 -ac_reward=500000000 -ac_supply=55555 -gen=1 -genproclimit=1 -testnode=1

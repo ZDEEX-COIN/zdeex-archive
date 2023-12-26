@@ -1,0 +1,24 @@
+# Copyright (c) 2016-2023 The Hush developers
+# Distributed under the GPLv3 software license, see the accompanying
+# file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
+
+TESTS += hush-test
+bin_PROGRAMS += hush-test
+
+# tool for generating our public parameters
+hush_test_SOURCES = test-hush/main.cpp
+# devs can enable this shit, it just slows down default compiles
+#	test-hush/testutils.cpp \
+#	test-hush/test_cryptoconditions.cpp \
+#	test-hush/test_coinimport.cpp \
+#	test-hush/test_eval_bet.cpp \
+#	test-hush/test_eval_notarization.cpp \
+#	test-hush/test_parse_notarization.cpp \
+#	test-hush/test_addrman.cpp \
+#	test-hush/test_netbase_tests.cpp
+
+hush_test_CPPFLAGS = $(hushd_CPPFLAGS)
+
+hush_test_LDADD = -lgtest $(hushd_LDADD)
+
+hush_test_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) -static

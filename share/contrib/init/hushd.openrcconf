@@ -1,0 +1,33 @@
+# /etc/conf.d/hushd: config file for /etc/init.d/hushd
+
+# Config file location
+#HUSHD_CONFIGFILE="/etc/hush/hush.conf"
+
+# What directory to write pidfile to?  (created and owned by $HUSHD_USER)
+#HUSHD_PIDDIR="/var/run/hushd"
+
+# What filename to give the pidfile
+#HUSHD_PIDFILE="${HUSHD_PIDDIR}/hushd.pid"
+
+# Where to write hushd data (be mindful that the blockchain is large)
+#HUSHD_DATADIR="/var/lib/hushd"
+
+# User and group to own hushd process
+#HUSHD_USER="hush"
+#HUSHD_GROUP="hush"
+
+# Path to hushd executable
+#HUSHD_BIN="/usr/bin/hushd"
+
+# Nice value to run hushd under
+#HUSHD_NICE=0
+
+# Additional options (avoid -conf and -datadir, use flags above)
+HUSHD_OPTS="-disablewallet"
+
+# The timeout in seconds OpenRC will wait for hushd to terminate
+# after a SIGTERM has been raised.
+# Note that this will be mapped as argument to start-stop-daemon's
+# '--retry' option, which means you can specify a retry schedule
+# here. For more information see man 8 start-stop-daemon.
+HUSHD_SIGTERM_TIMEOUT=60

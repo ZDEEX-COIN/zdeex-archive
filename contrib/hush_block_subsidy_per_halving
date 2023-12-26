@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+# Copyright 2016-2020 The Hush developers
+# Released under the GPLv3
+
+use strict;
+use warnings;
+
+my $x = 12.5 * 100000000;
+my $n = 0;
+while ($n<=31) {
+    #printf "$n,%.16g,%.16g,%.16g\n", $x, $x*0.90, $x*0.1;
+    printf "$n,%d,%d,%d\n", $x, $x*0.90, $x*0.1;
+    $x = $x / 2;
+    $n++;
+    exit if ($x <= 0);
+}
+

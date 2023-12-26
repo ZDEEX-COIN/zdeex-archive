@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Copyright 2016-2023 The Hush Developers
+# Copyright 2022      The DragonX Developers
+# Released under the GPLv3
+
+# set working directory to the location of this script
+# readlink -f does not always exist
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $DIR
+DIR="$( cd "$( dirname "$( readlink "${BASH_SOURCE[0]}" )" )" && pwd )"
+cd $DIR
+
+BLOCKTIME=18
+SUPPLY=0
+
+# same as TESTDRAGONX except equihash and different ac_name
+# and debug=pow which is the equivalent of debug=randomx for equihash mining
+./hush-smart-chain -ac_name=TESTEQUIHASH -ac_halving=3500000 -ac_reward=300000000 -ac_blocktime=$BLOCKTIME -ac_private=1 -ac_supply=$SUPPLY -debug=pow $@

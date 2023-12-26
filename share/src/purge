@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Copyright (c) 2016-2023 The Hush developers
+# Released under the GPLv3
+
+echo "Purging $1"
+
+rm -rf ~/.hush/$1/chainstate
+rm -rf ~/.hush/$1/database
+rm -rf ~/.hush/$1/blocks
+rm -rf ~/.hush/$1/hushstate

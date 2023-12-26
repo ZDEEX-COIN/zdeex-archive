@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Copyright (c) 2016-2023 The Hush developers
+# Distributed under the GPLv3 software license, see the accompanying
+# file COPYING or https://www.gnu.org/licenses/gpl-3.0.en.html
+
+# set working directory to the location of this script
+# readlink -f does not always exist
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $DIR
+DIR="$( cd "$( dirname "$( readlink "${BASH_SOURCE[0]}" )" )" && pwd )"
+cd $DIR
+
+# ./hushd -ac_name=TUSH -ac_private=1 -gen=1 -testnode=1
+./hushd -ac_name=TUSH -ac_private=1 -ac_supply=55555
+
