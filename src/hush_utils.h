@@ -858,7 +858,7 @@ int32_t unhex(char c)
     int32_t hex;
     if ( (hex= _unhex(c)) < 0 )
     {
-        //printf("unhex: illegal hexchar.(%c)\n",c);
+        fprintf(stderr,"unhex: illegal hexchar.(%c)\n",c);
     }
     return(hex);
 }
@@ -1513,14 +1513,6 @@ int32_t hush_whoami(char *pubkeystr,int32_t height,uint32_t timestamp)
     return(notaryid);
 }
 
-char *argv0suffix[] = {
-    (char *)"fuckjl777d", (char *)"fuckjl777-cli", (char *)"fuckjl777d.exe", (char *)"fuckjl777-cli.exe", (char *)"btchd", (char *)"btch-cli", (char *)"btchd.exe", (char *)"btch-cli.exe"
-};
-
-char *argv0names[] = {
-    (char *)"FUCKJL777", (char *)"FUCKJL777", (char *)"FUCKJL777", (char *)"FUCKJL777", (char *)"BTCH", (char *)"BTCH", (char *)"BTCH", (char *)"BTCH"
-};
-
 // Large total supplies lead to numerical errors, beware!
 uint64_t hush_max_money()
 {
@@ -1528,7 +1520,7 @@ uint64_t hush_max_money()
 }
 
 // This implements the Hush Emission Curve, the miner subsidy part,
-// and must be kept in sync with hush_commision() in komoto_bitcoind.h!
+// and must be kept in sync with hush_commision() in hush_bitcoind.h!
 // Changing these functions are consensus changes!
 // Here Be Dragons! -- Duke Leto
 uint64_t hush_block_subsidy(int height)
@@ -1803,21 +1795,6 @@ void hush_args(char *argv0)
 	name = GetArg("-ac_name","HUSH3");
     fprintf(stderr,".oO Starting %s Full Node (Extreme Privacy!) with genproc=%d notary=%d\n",name.c_str(),HUSH_MININGTHREADS, IS_HUSH_NOTARY);
 
-    if ( argv0 != 0 )
-    {
-        len = (int32_t)strlen(argv0);
-        for (i=0; i<sizeof(argv0suffix)/sizeof(*argv0suffix); i++)
-        {
-            n = (int32_t)strlen(argv0suffix[i]);
-            if ( strcmp(&argv0[len - n],argv0suffix[i]) == 0 )
-            {
-                //printf("ARGV0.(%s) -> matches suffix (%s) -> ac_name.(%s)\n",argv0,argv0suffix[i],argv0names[i]);
-                name = argv0names[i];
-                break;
-            }
-        }
-    }
-
     vector<string> HUSH_nodes= {"node1.hush.is","node2.hush.is","node3.hush.is",
                                 "node4.hush.is","node5.hush.is","node6.hush.is",
                                 "node7.hush.is","node8.hush.is","node1.hush.land", "node2.hush.land", "node3.hush.land", "node4.hush.land", "node5.hush.land"};
@@ -1899,7 +1876,7 @@ void hush_args(char *argv0)
             printf("ASSETCHAINS_ALGO, %s not supported. using equihash\n", selectedAlgo.c_str());
         }
 
-        // Set our symobl from -ac_name value
+        // Set our symbol from -ac_name value
         strncpy(SMART_CHAIN_SYMBOL,name.c_str(),sizeof(SMART_CHAIN_SYMBOL)-1);
         bool ishush3 = strncmp(SMART_CHAIN_SYMBOL, "HUSH3",5) == 0 ? true : false;
 

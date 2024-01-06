@@ -26,7 +26,8 @@ If the last command has no output, congrats, there is nothing to do. If the last
 ```
 git checkout master
 git merge --no-ff dev # using the default commit message is fine
-git push origin master
+git tag vX.Y.Z # this creates a tag vX.Y.Z on current master, or you can let gitea do it later
+git push --tags origin master
 git checkout dev
 git merge master
 git push origin dev

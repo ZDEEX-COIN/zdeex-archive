@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-# Copyright (c) 2016-2023 The Hush developers
-set -eo pipefail
-hush_cli='./hush-cli'
-
-./listassetchains | while read chain; do
-  $hush_cli --ac_name=$chain stop
-done
-

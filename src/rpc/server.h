@@ -391,7 +391,6 @@ extern UniValue setstakingsplit(const UniValue& params, bool fHelp, const CPubKe
 extern UniValue getwalletinfo(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue getblockchaininfo(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue getnetworkinfo(const UniValue& params, bool fHelp, const CPubKey& mypk);
-extern UniValue getdeprecationinfo(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue setmocktime(const UniValue& params, bool fHelp, const CPubKey& mypk);
 extern UniValue resendwallettransactions(const UniValue& params, bool fHelp, const CPubKey& mypk);
 

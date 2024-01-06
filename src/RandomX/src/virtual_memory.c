@@ -148,9 +148,9 @@ void* allocMemoryPages(size_t bytes) {
 		mem = NULL;
 #if defined(USE_PTHREAD_JIT_WP) && defined(MAC_OS_VERSION_11_0) \
 	&& MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_VERSION_11_0
-	if (__builtin_available(macOS 11.0, *)) {
+	//if (__builtin_available(macOS 11.0, *)) {
 		pthread_jit_write_protect_np(0);
-	}
+	//}
 #endif
 #endif
 	return mem;
@@ -173,11 +173,11 @@ void setPagesRW(void* ptr, size_t bytes) {
 	char *errfunc;
 #if defined(USE_PTHREAD_JIT_WP) && defined(MAC_OS_VERSION_11_0) \
 	&& MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_VERSION_11_0
-	if (__builtin_available(macOS 11.0, *)) {
+	//if (__builtin_available(macOS 11.0, *)) {
 		pthread_jit_write_protect_np(0);
-	} else {
-		pageProtect(ptr, bytes, PAGE_READWRITE, &errfunc);
-	}
+	//} else {
+	//	pageProtect(ptr, bytes, PAGE_READWRITE, &errfunc);
+	//}
 #else
 	pageProtect(ptr, bytes, PAGE_READWRITE, &errfunc);
 #endif
@@ -187,12 +187,12 @@ void setPagesRX(void* ptr, size_t bytes) {
 	char *errfunc;
 #if defined(USE_PTHREAD_JIT_WP) && defined(MAC_OS_VERSION_11_0) \
 	&& MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_VERSION_11_0
-	if (__builtin_available(macOS 11.0, *)) {
+	//if (__builtin_available(macOS 11.0, *)) {
 		pthread_jit_write_protect_np(1);
 		__builtin___clear_cache((char*)ptr, ((char*)ptr) + bytes);
-	} else {
-		pageProtect(ptr, bytes, PAGE_EXECUTE_READ, &errfunc);
-	}
+	//} else {
+	//	pageProtect(ptr, bytes, PAGE_EXECUTE_READ, &errfunc);
+	//}
 #else
 	pageProtect(ptr, bytes, PAGE_EXECUTE_READ, &errfunc);
 #endif

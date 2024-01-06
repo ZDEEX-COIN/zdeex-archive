@@ -27,7 +27,6 @@
 #include "checkqueue.h"
 #include "consensus/upgrades.h"
 #include "consensus/validation.h"
-#include "deprecation.h"
 #include "init.h"
 #include "merkleblock.h"
 #include "metrics.h"
@@ -3713,9 +3712,12 @@ bool static FlushStateToDisk(CValidationState &state, FlushStateMode mode) {
                 // Now that we have written the block indices to the database, we do not
                 // need to store solutions for these CBlockIndex objects in memory.
                 // cs_main must be held here.
+                uint32_t nTrimmed = 0;
                 for (CBlockIndex *pblockindex : vBlocks) {
                     pblockindex->TrimSolution();
+                    ++nTrimmed;
                 }
+                LogPrintf("%s: trimmed %d solutions from block index mode=%d\n", __func__, nTrimmed, mode);
             }
             // Finally remove any pruned files
             if (fFlushForPrune)
@@ -4026,8 +4028,6 @@ bool static ConnectTip(CValidationState &state, CBlockIndex *pindexNew, CBlock *
     // Updates to connected wallets are triggered by ThreadNotifyWallets
     recentlyConflictedTxs.insert(std::make_pair(pindexNew, txConflicted));
     nRecentlyConflictedSequence += 1;
-
-    EnforceNodeDeprecation(pindexNew->GetHeight());
 
     int64_t nTime6 = GetTimeMicros(); nTimePostConnect += nTime6 - nTime5; nTimeTotal += nTime6 - nTime1;
     LogPrint("bench", "  - Connect postprocess: %.2fms [%.2fs]\n", (nTime6 - nTime5) * 0.001, nTimePostConnect * 0.000001);
@@ -5992,7 +5992,6 @@ bool static LoadBlockIndexDB()
               DateTimeStrFormat("%Y-%m-%d %H:%M:%S", chainActive.LastTip()->GetBlockTime()),
 	      progress);
 
-    EnforceNodeDeprecation(chainActive.Height(), true);
     CBlockIndex *pindex;
     if ( (pindex= chainActive.LastTip()) != 0 )
     {

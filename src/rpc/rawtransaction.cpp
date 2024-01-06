@@ -21,7 +21,6 @@
 #include "consensus/validation.h"
 #include "core_io.h"
 #include "init.h"
-#include "deprecation.h"
 #include "key_io.h"
 #include "keystore.h"
 #include "main.h"

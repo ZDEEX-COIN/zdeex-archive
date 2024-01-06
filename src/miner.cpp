@@ -660,27 +660,29 @@ CBlockTemplate* CreateNewBlock(CPubKey _pk,const CScript& _scriptPubKeyIn, int32
 
         pblock->vtx[0] = txNew;
 
-        ASSETCHAINS_SCRIPTPUB = devtax_scriptpub_for_height(nHeight);
-        if ( nHeight > 1 && SMART_CHAIN_SYMBOL[0] != 0 && (ASSETCHAINS_OVERRIDE_PUBKEY33[0] != 0 || ASSETCHAINS_SCRIPTPUB.size() > 1) && (ASSETCHAINS_COMMISSION != 0 || ASSETCHAINS_FOUNDERS_REWARD != 0)  && (commission= the_commission((CBlock*)&pblocktemplate->block,(int32_t)nHeight)) != 0 )
+        // Create a local variable instead of modifying the global ASSETCHAINS_SCRIPTPUB
+        auto assetchains_scriptpub = devtax_scriptpub_for_height(nHeight);
+
+        if ( nHeight > 1 && SMART_CHAIN_SYMBOL[0] != 0 && (ASSETCHAINS_OVERRIDE_PUBKEY33[0] != 0 || assetchains_scriptpub.size() > 1) && (ASSETCHAINS_COMMISSION != 0 || ASSETCHAINS_FOUNDERS_REWARD != 0)  && (commission= the_commission((CBlock*)&pblocktemplate->block,(int32_t)nHeight)) != 0 )
         {
             int32_t i; uint8_t *ptr;
             txNew.vout.resize(2);
             txNew.vout[1].nValue = commission;
-            if ( ASSETCHAINS_SCRIPTPUB.size() > 1 )
+            if ( assetchains_scriptpub.size() > 1 )
             {
                 static bool didinit = false;
                 if ( !didinit && nHeight > HUSH_EARLYTXID_HEIGHT && HUSH_EARLYTXID != zeroid && hush_appendACscriptpub() )
                 {
-                    fprintf(stderr, "appended ccopreturn to ASSETCHAINS_SCRIPTPUB.%s\n", ASSETCHAINS_SCRIPTPUB.c_str());
+                    fprintf(stderr, "appended ccopreturn to assetchains_scriptpub.%s\n", assetchains_scriptpub.c_str());
                     didinit = true;
                 }
                 //fprintf(stderr,"mine to -ac_script\n");
                 //txNew.vout[1].scriptPubKey = CScript() << ParseHex();
-                int32_t len = strlen(ASSETCHAINS_SCRIPTPUB.c_str());
+                int32_t len = strlen(assetchains_scriptpub.c_str());
                 len >>= 1;
                 txNew.vout[1].scriptPubKey.resize(len);
                 ptr = (uint8_t *)&txNew.vout[1].scriptPubKey[0];
-                decode_hex(ptr,len,(char *)ASSETCHAINS_SCRIPTPUB.c_str());
+                decode_hex(ptr,len,(char *)assetchains_scriptpub.c_str());
             } else {
                 txNew.vout[1].scriptPubKey.resize(35);
                 ptr = (uint8_t *)&txNew.vout[1].scriptPubKey[0];
@@ -850,8 +852,10 @@ CBlockTemplate* CreateNewBlockWithKey(CReserveKey& reservekey, int32_t nHeight, 
 {
     CPubKey pubkey; CScript scriptPubKey; uint8_t *script,*ptr; int32_t i,len;
     // fprintf(stderr,"%s: with nHeight=%d\n", __func__, nHeight);
-    ASSETCHAINS_SCRIPTPUB = devtax_scriptpub_for_height(nHeight);
-    if ( nHeight == 1 && ASSETCHAINS_COMMISSION != 0 && ASSETCHAINS_SCRIPTPUB[ASSETCHAINS_SCRIPTPUB.back()] != 49 && ASSETCHAINS_SCRIPTPUB[ASSETCHAINS_SCRIPTPUB.back()-1] != 51 )
+
+    // Create a local variable instead of modifying the global assetchains_scriptpub
+    auto assetchains_scriptpub = devtax_scriptpub_for_height(nHeight);
+    if ( nHeight == 1 && ASSETCHAINS_COMMISSION != 0 && assetchains_scriptpub[assetchains_scriptpub.back()] != 49 && assetchains_scriptpub[assetchains_scriptpub.back()-1] != 51 )
     {
         if ( ASSETCHAINS_OVERRIDE_PUBKEY33[0] != 0 )
         {
@@ -859,11 +863,11 @@ CBlockTemplate* CreateNewBlockWithKey(CReserveKey& reservekey, int32_t nHeight, 
             scriptPubKey = CScript() << ParseHex(HexStr(pubkey)) << OP_CHECKSIG;
             // fprintf(stderr,"%s: with pubkey=%s\n", __func__, HexStr(pubkey).c_str() );
         } else {
-            len = strlen(ASSETCHAINS_SCRIPTPUB.c_str());
+            len = strlen(assetchains_scriptpub.c_str());
             len >>= 1;
             scriptPubKey.resize(len);
             ptr = (uint8_t *)&scriptPubKey[0];
-            decode_hex(ptr,len,(char *)ASSETCHAINS_SCRIPTPUB.c_str());
+            decode_hex(ptr,len,(char *)assetchains_scriptpub.c_str());
         }
     } else if ( USE_EXTERNAL_PUBKEY != 0 ) {
         //fprintf(stderr,"use notary pubkey\n");
@@ -1266,7 +1270,6 @@ void static RandomXMiner()
             LogPrintf("Running HushRandomXMiner with %u transactions in block (%u bytes)\n",pblock->vtx.size(),::GetSerializeSize(*pblock,SER_NETWORK,PROTOCOL_VERSION));
 
             // Search
-            uint8_t pubkeys[66][33]; arith_uint256 bnMaxPoSdiff; uint32_t blocktimes[66]; int mids[256],nonzpkeys,i,j,externalflag;
             uint32_t savebits;
             int64_t nStart = GetTime();
             pblock->nBits  = GetNextWorkRequired(pindexPrev, pblock, Params().GetConsensus());
@@ -1613,7 +1616,7 @@ void static BitcoinMiner()
             LogPrintf("Running HushMiner.%s with %u transactions in block (%u bytes)\n",solver.c_str(),pblock->vtx.size(),::GetSerializeSize(*pblock,SER_NETWORK,PROTOCOL_VERSION));
 
             // Search
-            uint8_t pubkeys[66][33]; arith_uint256 bnMaxPoSdiff; uint32_t blocktimes[66]; int mids[256],nonzpkeys,i,j,externalflag; uint32_t savebits; int64_t nStart = GetTime();
+            uint32_t savebits; int64_t nStart = GetTime();
             pblock->nBits         = GetNextWorkRequired(pindexPrev, pblock, Params().GetConsensus());
             savebits = pblock->nBits;
             HASHTarget = arith_uint256().SetCompact(savebits);

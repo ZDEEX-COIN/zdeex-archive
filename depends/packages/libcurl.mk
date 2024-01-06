@@ -14,7 +14,7 @@ $(package)_dependencies=wolfssl
 $(package)_download_path=https://curl.haxx.se/download
 $(package)_config_opts_linux=--disable-shared --enable-static --without-ssl --prefix=$(host_prefix) --host=$(host)
 $(package)_config_opts_mingw32=--enable-mingw --disable-shared --enable-static --with-wolfssl --without-ssl --prefix=$(host_prefix) --host=x86_64-w64-mingw32
-$(package)_config_opts_darwin=--disable-shared --enable-static --with-wolfssl --without-ssl --prefix=$(host_prefix)
+$(package)_config_opts_darwin=--disable-shared --enable-static --without-ssl --prefix=$(host_prefix)
 $(package)_cflags_darwin=-mmacosx-version-min=10.9
 $(package)_conf_tool=./configure
 

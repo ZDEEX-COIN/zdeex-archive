@@ -165,7 +165,6 @@ BITCOIN_CORE_H = \
   consensus/validation.h \
   core_io.h \
   core_memusage.h \
-  deprecation.h \
   fs.h \
   hash.h \
   httprpc.h \
@@ -300,7 +299,6 @@ libbitcoin_server_a_SOURCES = \
   fs.cpp \
   crosschain.cpp \
   crosschain_authority.cpp \
-  deprecation.cpp \
   httprpc.cpp \
   httpserver.cpp \
   i2p.cpp \

@@ -10,6 +10,23 @@ and no longer on Github, since they banned Duke Leto and
 also because they censor many people around the world and work with
 evil organizations.
 
+# Hush 3.10.1 "Oneiric Octopus"
+
+This is an OPTIONAL but RECOMMENDED release for Hush full nodes. It fixes an important bug
+that affects new Hush nodes. It also makes syncing faster for both Hushd and DragonX nodes.
+
+```
+ 26 files changed, 257 insertions(+), 429 deletions(-)
+```
+
+  * Fix the bug which causes "payment to wrong pubkey" error when syncing a new node
+  * Faster syncing of Hush and DragonX full nodes
+  * Slightly less memory usage in each Equihash/RandomX mining thread
+  * Fixed compiling issues related to RandomX v1.2.1
+  * Improved RPC docs for `getblocktemplate`
+  * Removed the `getdeprecationinfo` RPC
+
+
 # Hush 3.10.0 "Sassy Siphonophore"
 
 ```

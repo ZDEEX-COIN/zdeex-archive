@@ -551,34 +551,6 @@ CScript hush_makeopret(CBlock *pblock, bool fNew)
     return(opret);
 }
 
-/*uint256 hush_getblockhash(int32_t height)
- {
- uint256 hash; char params[128],*hexstr,*jsonstr; cJSON *result; int32_t i; uint8_t revbuf[32];
- memset(&hash,0,sizeof(hash));
- sprintf(params,"[%d]",height);
- if ( (jsonstr= hush_issuemethod(HUSHUSERPASS,(char *)"getblockhash",params,BITCOIND_RPCPORT)) != 0 )
- {
- if ( (result= cJSON_Parse(jsonstr)) != 0 )
- {
- if ( (hexstr= jstr(result,(char *)"result")) != 0 )
- {
- if ( is_hexstr(hexstr,0) == 64 )
- {
- decode_hex(revbuf,32,hexstr);
- for (i=0; i<32; i++)
- ((uint8_t *)&hash)[i] = revbuf[31-i];
- }
- }
- free_json(result);
- }
- printf("HUSH3 hash.%d (%s) %x\n",height,jsonstr,*(uint32_t *)&hash);
- free(jsonstr);
- }
- return(hash);
- }
-
- uint256 _hush_getblockhash(int32_t height);*/
-
 uint64_t hush_seed(int32_t height)
 {
     uint64_t seed = 0;
@@ -724,6 +696,7 @@ int32_t hush_block2height(CBlock *block)
     return(height);
 }
 
+// return true if the first output of the first tx in a block is valid
 int32_t hush_block2pubkey33(uint8_t *pubkey33,CBlock *block)
 {
     int32_t n;
@@ -976,7 +949,7 @@ CAmount GetBlockSubsidy(int nHeight, const Consensus::Params& consensusParams);
 // 10% of all block rewards go towards Hush core team
 // If you do not like this, you are encouraged to fork the chain
 // or start your own Hush Smart Chain: https://git.hush.is/hush/hush-smart-chains
-// HUSH supply curve cannot be exactly represented via KMD AC CLI args, so we do it ourselves.
+// HUSH supply curve cannot be exactly represented via CLI args, so we do it ourselves.
 // You specify the BR, and the FR % gets added so 10% of 12.5 is 1.25
 // but to tell the AC params, I need to say "11% of 11.25" is 1.25
 // 11% ie. 1/9th cannot be exactly represented and so the FR has tiny amounts of error unless done manually
@@ -1619,7 +1592,10 @@ int64_t hush_checkcommission(CBlock *pblock,int32_t height)
     if(fDebug)
         fprintf(stderr,"%s at height=%d\n",__func__,height);
     int64_t checktoshis=0; uint8_t *script,scripthex[8192]; int32_t scriptlen,matched = 0; static bool didinit = false;
-    ASSETCHAINS_SCRIPTPUB = devtax_scriptpub_for_height(height);
+
+    // Create a local variable instead of modifying the global ASSETCHAINS_SCRIPTPUB
+    auto assetchains_scriptpub = devtax_scriptpub_for_height(height);
+
     if ( ASSETCHAINS_COMMISSION != 0 || ASSETCHAINS_FOUNDERS_REWARD != 0 )
     {
         checktoshis = the_commission(pblock,height);
@@ -1639,19 +1615,22 @@ int64_t hush_checkcommission(CBlock *pblock,int32_t height)
                     fprintf(stderr,"%02x",script[i]);
                 fprintf(stderr," vout[1] %.8f vs %.8f\n",(double)checktoshis/COIN,(double)pblock->vtx[0].vout[1].nValue/COIN);
             }
-            if ( ASSETCHAINS_SCRIPTPUB.size() > 1 )
+            if ( assetchains_scriptpub.size() > 1 )
             {
                 static bool didinit = false;
                 if ( !didinit && height > HUSH_EARLYTXID_HEIGHT && HUSH_EARLYTXID != zeroid && hush_appendACscriptpub() )
                 {
-                    fprintf(stderr, "appended CC_op_return to ASSETCHAINS_SCRIPTPUB.%s\n", ASSETCHAINS_SCRIPTPUB.c_str());
+                    fprintf(stderr, "appended CC_op_return to assetchains_scriptpub.%s\n", assetchains_scriptpub.c_str());
                     didinit = true;
                 }
-                if ( ASSETCHAINS_SCRIPTPUB.size()/2 == scriptlen && scriptlen < sizeof(scripthex) )
+                if ( assetchains_scriptpub.size()/2 == scriptlen && scriptlen < sizeof(scripthex) )
                 {
-                    decode_hex(scripthex,scriptlen,(char *)ASSETCHAINS_SCRIPTPUB.c_str());
-                    if ( memcmp(scripthex,script,scriptlen) == 0 )
+                    decode_hex(scripthex,scriptlen,(char *)assetchains_scriptpub.c_str());
+                    if ( memcmp(scripthex,script,scriptlen) == 0 ) {
                         matched = scriptlen;
+                    } else {
+                        fprintf(stderr, "%s: assetchains_scriptpub != scripthex scriptlen=%d\n", __func__, scriptlen);
+                    }
                 }
             }
             else if ( scriptlen == 35 && script[0] == 33 && script[34] == OP_CHECKSIG && memcmp(script+1,ASSETCHAINS_OVERRIDE_PUBKEY33,33) == 0 )
@@ -1660,13 +1639,19 @@ int64_t hush_checkcommission(CBlock *pblock,int32_t height)
                 matched = 25;
             if ( matched == 0 )
             {
-                if ( 0 && ASSETCHAINS_SCRIPTPUB.size() > 1 )
+                if ( assetchains_scriptpub.size() > 1 )
                 {
                     int32_t i;
-                    for (i=0; i<ASSETCHAINS_SCRIPTPUB.size(); i++)
-                        fprintf(stderr,"%02x",ASSETCHAINS_SCRIPTPUB[i]);
+                    fprintf(stderr,"%s: assetchains_scriptpub=", __func__);
+                    for (i=0; i<assetchains_scriptpub.size(); i++) {
+                        fprintf(stderr,"%02x",assetchains_scriptpub[i]);
+                    }
+                    fprintf(stderr," vs script=");
+                    for (i=0; i<scriptlen; i++) {
+                        fprintf(stderr,"%02x",script[i]);
+                    }
                 }
-                fprintf(stderr," -ac[%d] payment to wrong pubkey scriptlen.%d, scriptpub[%d] checktoshis.%llu\n",(int32_t)ASSETCHAINS_SCRIPTPUB.size(),scriptlen,(int32_t)ASSETCHAINS_SCRIPTPUB.size()/2,(long long)checktoshis);
+                fprintf(stderr," -ac[%d] payment to wrong pubkey scriptlen.%d, scriptpub[%d] checktoshis.%llu\n",(int32_t)assetchains_scriptpub.size(),scriptlen,(int32_t)assetchains_scriptpub.size()/2,(long long)checktoshis);
                 return(-1);
 
             }
@@ -1686,7 +1671,8 @@ bool HUSH_TEST_ASSETCHAIN_SKIP_POW = 0;
 
 int32_t hush_checkPOW(int32_t slowflag,CBlock *pblock,int32_t height)
 {
-    uint256 hash,merkleroot; arith_uint256 bnTarget,bhash; bool fNegative,fOverflow; uint8_t *script,pubkey33[33],pubkeys[64][33]; int32_t i,scriptlen,possible,PoSperc,is_PoSblock=0,n,failed = 0,notaryid = -1; int64_t checktoshis,value; CBlockIndex *pprev;
+    uint256 hash,merkleroot; arith_uint256 bnTarget,bhash; bool fNegative,fOverflow; uint8_t *script,pubkey33[33];
+    int32_t i,scriptlen,possible,PoSperc,is_PoSblock=0,n,failed = 0,notaryid = -1; int64_t checktoshis,value; CBlockIndex *pprev;
     if ( HUSH_TEST_ASSETCHAIN_SKIP_POW == 0 && Params().NetworkIDString() == "regtest" )
         HUSH_TEST_ASSETCHAIN_SKIP_POW = 1;
     if ( !CheckEquihashSolution(pblock, Params()) )
@@ -1712,18 +1698,7 @@ int32_t hush_checkPOW(int32_t slowflag,CBlock *pblock,int32_t height)
 
     if ( (SMART_CHAIN_SYMBOL[0] != 0) && bhash > bnTarget ) {
         failed = 1;
-        if ( height > 0 && SMART_CHAIN_SYMBOL[0] == 0 ) // for the fast case
-        {
-            if ( (n= hush_notaries(pubkeys,height,pblock->nTime)) > 0 )
-            {
-                for (i=0; i<n; i++)
-                    if ( memcmp(pubkey33,pubkeys[i],33) == 0 )
-                    {
-                        notaryid = i;
-                        break;
-                    }
-            }
-        } else if ( possible == 0 || SMART_CHAIN_SYMBOL[0] != 0 ) {
+        if ( possible == 0 || SMART_CHAIN_SYMBOL[0] != 0 ) {
             if ( HUSH_TEST_ASSETCHAIN_SKIP_POW )
                 return(0);
             if ( ASSETCHAINS_STAKED == 0 )
@@ -1732,13 +1707,14 @@ int32_t hush_checkPOW(int32_t slowflag,CBlock *pblock,int32_t height)
     }
     if ( failed == 0 && ASSETCHAINS_COMMISSION != 0 ) {
         if ( height == 1 ) {
-            ASSETCHAINS_SCRIPTPUB = devtax_scriptpub_for_height(height);
-            if ( ASSETCHAINS_SCRIPTPUB.size() > 1 && ASSETCHAINS_SCRIPTPUB[ASSETCHAINS_SCRIPTPUB.back()] != 49 && ASSETCHAINS_SCRIPTPUB[ASSETCHAINS_SCRIPTPUB.back()-1] != 51 ) {
+            // Create a local variable instead of modifying the global assetchains_scriptpub
+            auto assetchains_scriptpub = devtax_scriptpub_for_height(height);
+            if ( assetchains_scriptpub.size() > 1 && assetchains_scriptpub[assetchains_scriptpub.back()] != 49 && assetchains_scriptpub[assetchains_scriptpub.back()-1] != 51 ) {
                 int32_t scriptlen; uint8_t scripthex[10000];
                 script = (uint8_t *)&pblock->vtx[0].vout[0].scriptPubKey[0];
                 scriptlen = (int32_t)pblock->vtx[0].vout[0].scriptPubKey.size();
-                if ( ASSETCHAINS_SCRIPTPUB.size()/2 == scriptlen && scriptlen < sizeof(scripthex) ) {
-                    decode_hex(scripthex,scriptlen,(char *)ASSETCHAINS_SCRIPTPUB.c_str());
+                if ( assetchains_scriptpub.size()/2 == scriptlen && scriptlen < sizeof(scripthex) ) {
+                    decode_hex(scripthex,scriptlen,(char *)assetchains_scriptpub.c_str());
                     if ( memcmp(scripthex,script,scriptlen) != 0 )
                         return(-1);
                 } else return(-1);

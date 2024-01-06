@@ -27,7 +27,6 @@
 #include "timedata.h"
 #include "util.h"
 #include "version.h"
-#include "deprecation.h"
 #include "hush/utiltls.h"
 #include <boost/foreach.hpp>
 #include <univalue.h>
@@ -495,33 +494,6 @@ static UniValue GetNetworksInfo()
     return networks;
 }
 
-UniValue getdeprecationinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
-{
-    const CChainParams& chainparams = Params();
-    if (fHelp || params.size() != 0 || chainparams.NetworkIDString() != "main")
-        throw runtime_error(
-            "getdeprecationinfo\n"
-            "Returns an object containing current version and deprecation block height. Applicable only on mainnet.\n"
-            "\nResult:\n"
-            "{\n"
-            "  \"version\": xxxxx,                      (numeric) the server version\n"
-            "  \"subversion\": \"/GoldenSandtrout:x.y.z[-v]/\",     (string) the server subversion string\n"
-            "  \"deprecationheight\": xxxxx,            (numeric) the block height at which this version will deprecate and shut down\n"
-            "}\n"
-            "\nExamples:\n"
-            + HelpExampleCli("getdeprecationinfo", "")
-            + HelpExampleRpc("getdeprecationinfo", "")
-        );
-
-    UniValue obj(UniValue::VOBJ);
-    obj.push_back(Pair("version", CLIENT_VERSION));
-    obj.push_back(Pair("subversion",
-        FormatSubVersion(GetArg("-clientname","GoldenSandtrout"), CLIENT_VERSION, std::vector<string>())));
-    obj.push_back(Pair("deprecationheight", DEPRECATION_HEIGHT));
-
-    return obj;
-}
-
 UniValue getnetworkinfo(const UniValue& params, bool fHelp, const CPubKey& mypk)
 {
     if (fHelp || params.size() != 0)
@@ -710,7 +682,6 @@ static const CRPCCommand commands[] =
 { //  category              name                      actor (function)         okSafeMode
   //  --------------------- ------------------------  -----------------------  ----------
     { "network",            "getconnectioncount",     &getconnectioncount,     true  },
-    { "network",            "getdeprecationinfo",     &getdeprecationinfo,     true  },
     { "network",            "ping",                   &ping,                   true  },
     { "network",            "getpeerlist",            &getpeerlist,            true  },
     { "network",            "getpeerinfo",            &getpeerinfo,            true  },
