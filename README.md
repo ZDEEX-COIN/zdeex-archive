@@ -13,8 +13,7 @@ Please refer to the instructions which apply to you below:
 * See [INSTALL-BIN.md](INSTALL-BIN.md) to install pre-compiled binary on Linux
 
 # Start zdeex Ubuntu 20.04
-###### *`This doesn't work`
-./hushd: /lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.30' not found (required by ./hushd) do the following command:*
+###### *`This doesn't work` ./hushd: /lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.30' not found (required by ./hushd) do the following command:*
 ```
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test
 sudo apt update
