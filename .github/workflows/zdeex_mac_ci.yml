@@ -1,0 +1,58 @@
+name: ZDEEX MacOS CI
+
+on:
+  push:
+    branches:
+    - dev
+    - main
+
+jobs:
+
+  macos-build:
+    name: MacOS Build
+    runs-on: macos-latest
+    
+    steps:
+      - uses: actions/checkout@v2
+
+      # Workaround for https://github.com/actions/setup-python/issues/577
+      - name: Clean up binaries and links (macOS)
+        run: |
+          rm -f /usr/local/bin/2to3-3.*
+          rm -f /usr/local/bin/idle3.*
+          rm -f /usr/local/bin/pydoc3.*
+          rm -f /usr/local/bin/python3.*
+          rm -f /usr/local/bin/2to3
+          rm -f /usr/local/bin/idle3
+          rm -f /usr/local/bin/pydoc3
+          rm -f /usr/local/bin/python3
+          rm -f /usr/local/bin/python3-config
+
+      - name: Install deps (macOS)
+        run: |
+          brew update
+          brew upgrade || true
+          brew tap discoteq/discoteq; brew install flock
+          brew install autoconf autogen automake
+          brew install gcc@8
+          brew install binutils
+          brew install protobuf
+          brew install coreutils
+          brew install wget
+          brew install python3
+          brew install gmp
+
+      - name: Build (macOS)
+        run: |
+          # flag for some CC tests transactions - so DO NOT USE THIS CI ARTIFACTS IN PRODUCTION!!!
+          export CPATH=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/
+          ./util/build-mac.sh -j4
+          tar -czvf zdeex-macos.tar.gz src/hushd src/hush-cli src/asmap.dat src/sapling-output.params src/sapling-spend.params src/zdeexd src/zdeex-cli
+
+      - name: Upload zdeex-macos.tar.gz as artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: zdeex-macos
+          path: ./zdeex-macos.tar.gz
+
+  

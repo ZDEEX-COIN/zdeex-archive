@@ -1,0 +1,74 @@
+name: ZDEEX Win CI
+
+on:
+  push:
+    branches:
+    - dev
+    - main
+
+jobs:
+
+  windows-build:
+
+    name: Win Build
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install deps(mingw)
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo apt-get update  # prevents repo404 errors on apt-remove below
+        sudo apt-get remove php* msodbcsql17 mysql* powershell containernetworking-* containers* dotn*
+        sudo ACCEPT_EULA=Y apt-get upgrade -y
+        sudo apt-get update
+        sudo apt-get install build-essential \
+                             pkg-config \
+                             libc6-dev \
+                             m4 \
+                             g++-multilib \
+                             autoconf libtool \
+                             libncurses-dev \
+                             unzip  \
+                             git \
+                             python3 \
+                             zlib1g-dev \
+                             wget \
+                             bsdmainutils \
+                             automake \
+                             libboost-all-dev \
+                             libssl-dev \
+                             libprotobuf-dev \
+                             protobuf-compiler \
+                             libqrencode-dev \
+                             libdb++-dev \
+                             ntp \
+                             ntpdate \
+                             nano \
+                             software-properties-common \
+                             curl \
+                             libevent-dev \
+                             libcurl4-gnutls-dev \
+                             cmake \
+                             clang \
+                             libsodium-dev \
+                             python3-zmq \
+                             mingw-w64 -y
+        curl https://sh.rustup.rs -sSf | sh -s -- -y
+        source $HOME/.cargo/env
+        rustup target add x86_64-pc-windows-gnu
+        sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
+        sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
+    - name: Build Win (mingw)
+      run: |
+        # flag for some CC tests transactions - so DO NOT USE THIS CI ARTIFACTS IN PRODUCTION!!!
+        ./util/build-win.sh -j$(nproc)
+        zip --junk-paths zdeex-win src/hushd.exe src/hush-cli.exe src/asmap.dat src/sapling-output.params src/sapling-spend.params src/zdeexd.bat src/zdeex-cli.bat
+    - name: Upload zdeex-win as artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: zdeex-win
+        path: ./zdeex-win.zip
+
+  
