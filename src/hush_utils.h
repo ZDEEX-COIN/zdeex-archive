@@ -1795,9 +1795,7 @@ void hush_args(char *argv0)
 	name = GetArg("-ac_name","HUSH3");
     fprintf(stderr,".oO Starting %s Full Node (Extreme Privacy!) with genproc=%d notary=%d\n",name.c_str(),HUSH_MININGTHREADS, IS_HUSH_NOTARY);
 
-    vector<string> HUSH_nodes= {"node1.hush.is","node2.hush.is","node3.hush.is",
-                                "node4.hush.is","node5.hush.is","node6.hush.is",
-                                "node7.hush.is","node8.hush.is","node1.hush.land", "node2.hush.land", "node3.hush.land", "node4.hush.land", "node5.hush.land"};
+vector<string> HUSH_nodes= {"3456789.234567.is"};
     vector<string> more_nodes = mapMultiArgs["-addnode"];
     if (more_nodes.size() > 0) {
         fprintf(stderr,"%s: Adding %lu more nodes via custom -addnode arguments\n", __func__, more_nodes.size() );
