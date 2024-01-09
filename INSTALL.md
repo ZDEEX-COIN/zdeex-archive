@@ -1,8 +1,7 @@
-# Installing Hush
+# Installing ZDEEX
 
-Instructions to compile Hush yourself.
 
-## Build HUSH dependencies
+## Build ZDEEX dependencies
 
 The following build process generally applies to Ubuntu (and similar) Linux
 distributions. For best results it is recommended to use Ubuntu Linux 16.04
@@ -19,84 +18,54 @@ sudo mkswap /swapfile
 sudo swapon /swapfile
 ```
 
-## Build on Linux:
+## Build on Ubuntu 20.04:
 
 ```sh
-# install build dependencies
-sudo apt-get install build-essential pkg-config libc6-dev m4 g++-multilib \
-      autoconf libtool ncurses-dev unzip git zlib1g-dev wget \
-      bsdmainutils automake curl unzip nano libsodium-dev cmake
-# clone git repo
-git clone https://git.hush.is/hush/hush3
-cd hush3
-# Build
-# This uses 3 build processes, you need 2GB of RAM for each. 
-./build.sh -j3
+          sudo apt-get update  # prevents repo404 errors on apt-remove below
+          sudo apt-get remove php* msodbcsql17 mysql* powershell dotn*
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get upgrade -y
+          sudo apt-get install -q curl python3 python3-dev python3-setuptools python3-pip libcurl4-openssl-dev libssl-dev -y
+          python3 -m pip install setuptools wheel
+          python3 -m pip install pytest wget jsonschema
+          python3 -m pip install -Iv https://github.com/KomodoPlatform/slick-bitcoinrpc/archive/refs/tags/0.1.4.tar.gz
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+          sudo apt update
+          sudo apt install gcc-9
+          sudo apt upgrade libstdc++6
+          ./util/build.sh -j$(nproc)
+          tar -czvf zdeex-linux.tar.gz src/hushd src/hush-cli src/asmap.dat src/sapling-output.params src/sapling-spend.params src/zdeexd src/zdeex-cli
 ```
 
-### Building On Ubuntu 16.04 and older systems
-
-Some older compilers may not be able to compile modern code, such as gcc 5.4 which comes with Ubuntu 16.04 by default. Here is how to install gcc 7 on Ubuntu 16.04. Run these commands as root:
-
-```
-add-apt-repository ppa:ubuntu-toolchain-r/test && \
-apt update && \
-apt-get install -y gcc-7 g++-7 && \
-  update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 60 && \
-  update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60
-```
-
-### Build on mac
-
-These instructions are a work in progress. Please report issues to https://hush.is/tg_support
-
-```
-sudo port update
-sudo port upgrade outdated
-sudo port install qt5
-
-# clone git repo
-git clone https://git.hush.is/hush/hush3
-cd hush3
-# Build
-# This uses 3 build processes, you need 2GB of RAM for each. 
-./build.sh -j3
-```
-
-## Run a HUSH Node
+## Run a ZDEEX Node Ubuntu 20.04
 
 After you have compiled Hush, then you can run it with the following command:
 
 ```sh
-./src/hushd
+./src/zdeexd
 ```
 
 ## Windows (cross-compiled on Linux)
 Get dependencies:
-```ssh
-sudo apt-get install \
-      build-essential pkg-config libc6-dev m4 g++-multilib \
-      autoconf libtool ncurses-dev unzip git python \
-      zlib1g-dev wget bsdmainutils automake mingw-w64 cmake libsodium-dev
 ```
+        sudo apt-get update  # prevents repo404 errors on apt-remove below
+        sudo apt-get remove php* msodbcsql17 mysql* powershell containernetworking-* containers* dotn*
+        sudo ACCEPT_EULA=Y apt-get upgrade -y
+        sudo apt-get update
+        sudo apt-get install build-essential pkg-config libc6-dev m4 g++-multilib autoconf libtool libncurses-dev unzip git python3 zlib1g-dev wget bsdmainutils automake libboost-all-dev libssl-dev libprotobuf-dev protobuf-compiler libqrencode-dev libdb++-dev ntp ntpdate nano software-properties-common curl libevent-dev libcurl4-gnutls-dev cmake clang libsodium-dev python3-zmq mingw-w64 -y
+        curl https://sh.rustup.rs -sSf | sh -s -- -y
+        source $HOME/.cargo/env
+        rustup target add x86_64-pc-windows-gnu
+        sudo update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32-gcc-posix
+        sudo update-alternatives --set x86_64-w64-mingw32-g++ /usr/bin/x86_64-w64-mingw32-g++-posix
+        ./util/build-win.sh -j$(nproc)
+        zip --junk-paths zdeex-win src/hushd.exe src/hush-cli.exe src/asmap.dat src/sapling-output.params src/sapling-spend.params src/zdeexd.bat src/zdeex-cli.bat
 
-Downloading Git source repo, building and running Hush:
+```
+## Run a ZDEEX Node Windows
+
+After you have compiled Hush, then you can run it with the following command:
 
 ```sh
-# pull
-git clone https://git.hush.is/hush/hush3
-cd hush
-# Build
-./build-win.sh -j$(nproc)
-# Run a HUSH node
-./src/hushd
+./src/zdeexd.exe
 ```
-
-## ARM Architecture
-
-Currently, any ARMv7 machine will not be able to build this repo, because the
-underlying tech (zcash and the zksnark library) do not support that instruction
-set.
-
-This also means that old RaspberryPi devices will not work, unless they have a
-newer ARMv8-based Raspberry Pi. Raspberry Pi 4 and newer are known to work.
